@@ -13,31 +13,41 @@ config()
 // to access env variable we need to call config()
 
 const app=express()
+// app.use(cors({
+//     origin:['http://localhost:5173','http://localhost:5174'],credentials:true
+// }))
 app.use(cors({
-    origin:['http://localhost:5173','http://localhost:5174'],credentials:true
+    origin: true,
+    credentials: true
 }))
 app.use(express.json())
 app.use(cookieParser())
+app.get("/", (req, res) => {
+  res.send("Backend is running ");
+});
+
 app.use('/user-api',userRoute);
 app.use('/author-api',authorRoute);
 app.use('/admin-api',adminRoute);
 app.use('/common-api',commonRouter)
 
  // connect to DB
- const connectDB=async()=>{
-    try{
-        
-        await connect(process.env.DB_URL)
-        console.log("DB connection success ")
-        app.listen(process.env.PORT,()=>console.log("server started at PORT",process.env.PORT))
+const PORT = process.env.PORT || 5000;
 
-    }catch(err){
-        console.log(err.message)
-    }
+const connectDB = async () => {
+  try {
+    await connect(process.env.DB_URL);
+    console.log("DB connection success");
+  } catch (err) {
+    console.log("DB error:", err.message);
+  }
+};
 
-
- }
 connectDB();
+
+app.listen(PORT, () => {
+  console.log("Server started at PORT", PORT);
+});
 
 // to Handle Invalid Routes
 app.use((req,res,next)=>{
